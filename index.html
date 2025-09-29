@@ -3,14 +3,71 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>🚀 Dodge the Rocket</title>
+    <title>🚀 Dodge the Rockets</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0b0c10;
+            font-family: 'Orbitron', monospace;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 25%, #0f0f23 100%);
             color: #c5c6c7;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Animated stars background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .stars::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+                radial-gradient(2px 2px at 160px 30px, #fff, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: sparkle 3s linear infinite;
+        }
+
+        .stars::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 60px 50px, #66fcf1, transparent),
+                radial-gradient(1px 1px at 120px 20px, #45a29e, transparent),
+                radial-gradient(1px 1px at 180px 90px, #66fcf1, transparent);
+            background-repeat: repeat;
+            background-size: 250px 150px;
+            animation: sparkle 4s linear infinite reverse;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
 
         html,
@@ -18,42 +75,148 @@
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="32" width="32"><text y="24" font-size="24">🛸</text></svg>') 16 16, auto;
         }
 
-        h1 {
-            text-align: center;
+        /* Game container with walls */
+        .game-container {
+            position: fixed;
+            top: 54px;
+            left: 54px;
+            right: 54px;
+            bottom: 54px;
+            border: 4px solid #66fcf1;
+            border-radius: 10px;
+            box-shadow: 
+                0 0 20px #66fcf1,
+                inset 0 0 20px rgba(102, 252, 241, 0.1);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(45deg, #66fcf1, #45a29e, #66fcf1);
+            border-radius: 10px;
+            z-index: -1;
+            animation: borderGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Title styling */
+        .game-title {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            font-weight: 900;
             color: #66fcf1;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #1f2833;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            border: 1px solid #45a29e;
+            text-shadow: 
+                0 0 10px #66fcf1,
+                0 0 20px #66fcf1,
+                0 0 40px #66fcf1;
+            z-index: 100;
+            animation: titlePulse 3s ease-in-out infinite;
             text-align: center;
+            letter-spacing: 3px;
         }
 
-        th {
-            background-color: #45a29e;
-            color: #0b0c10;
+        @keyframes titlePulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
         }
 
-        button {
-            padding: 6px 12px;
-            background-color: #66fcf1;
+        /* Score display */
+        .score-display {
+            position: fixed;
+            top: 100px;
+            right: 70px;
+            color: #66fcf1;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px #66fcf1;
+            z-index: 100;
+            background: rgba(11, 12, 16, 0.8);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 2px solid #45a29e;
+        }
+
+        /* Play button styling */
+        .play-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            background: linear-gradient(45deg, #66fcf1, #45a29e);
             color: #0b0c10;
             border: none;
-            border-radius: 5px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 2rem;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 
+                0 0 30px #66fcf1,
+                0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 200;
+            animation: buttonPulse 2s ease-in-out infinite;
         }
 
-        button:hover {
-            background-color: #45a29e;
+        .play-button:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 
+                0 0 50px #66fcf1,
+                0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% { box-shadow: 0 0 30px #66fcf1, 0 10px 20px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 50px #66fcf1, 0 10px 20px rgba(0, 0, 0, 0.3); }
+        }
+
+        /* Home screen styles */
+        .home-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 12, 16, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+        }
+
+        .home-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #66fcf1;
+            text-shadow: 
+                0 0 20px #66fcf1,
+                0 0 40px #66fcf1;
+            margin-bottom: 50px;
+            animation: homeTitleFloat 3s ease-in-out infinite alternate;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+
+        @keyframes homeTitleFloat {
+            0% { transform: translateY(-10px); }
+            100% { transform: translateY(10px); }
         }
 
         .rocket {
@@ -61,19 +224,29 @@
             bottom: -100px;
             left: 50%;
             font-size: 50px;
-            transform: rotate(-45deg); /* Rotate rocket upright */
-            animation: launch 10s forwards;
             z-index: 1000;
+            filter: drop-shadow(0 0 10px currentColor);
+            transform: rotate(315deg); /* Adjust rotation for perfect upward pointing */
         }
 
-        @keyframes launch {
-            0% {
-                bottom: -100px;
-            }
+        .rocket-type-1 {
+            animation: launch1 var(--duration) linear forwards;
+            transform: rotate(315deg); /* Adjust for perfect upward pointing */
+        }
 
-            100% {
-                bottom: 110%;
-            }
+        .rocket-type-2 {
+            animation: launch1 var(--duration) linear forwards;
+            transform: rotate(315deg); /* Adjust for perfect upward pointing */
+        }
+
+        .rocket-type-3 {
+            animation: launch1 var(--duration) linear forwards;
+            transform: rotate(315deg); /* Adjust for perfect upward pointing */
+        }
+
+        @keyframes launch1 {
+            0% { bottom: -100px; transform: rotate(315deg) translateX(0); }
+            100% { bottom: 110%; transform: rotate(315deg) translateX(0); }
         }
 
         .gameOverScreen {
@@ -83,86 +256,783 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
-            display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             z-index: 2000;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .game-over-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #ff4757;
+            text-shadow: 
+                0 0 20px #ff4757,
+                0 0 40px #ff4757;
+            margin-bottom: 30px;
+            animation: explosionPulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes explosionPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        .score-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            font-size: 1.5rem;
+            color: #66fcf1;
+            text-shadow: 0 0 10px #66fcf1;
+        }
+
+        .play-again-button {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #66fcf1, #45a29e);
+            color: #0b0c10;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 
+                0 0 20px #66fcf1,
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .play-again-button:hover {
+            transform: scale(1.1);
+            box-shadow: 
+                0 0 30px #66fcf1,
+                0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Power-up styles */
+        .power-up {
+            position: fixed;
+            font-size: 40px;
+            z-index: 1200;
+            animation: powerUpGlow 1s ease-in-out infinite alternate;
+            cursor: pointer;
+        }
+
+        @keyframes powerUpGlow {
+            0% { 
+                filter: drop-shadow(0 0 10px #ffd93d) drop-shadow(0 0 20px #ffd93d);
+                transform: scale(1);
+            }
+            100% { 
+                filter: drop-shadow(0 0 20px #ffd93d) drop-shadow(0 0 40px #ffd93d);
+                transform: scale(1.2);
+            }
+        }
+
+        .power-up-countdown {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffd93d;
+            font-family: 'Orbitron', monospace;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 1500;
+            border: 2px solid #ffd93d;
+        }
+
+        .countdown-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .countdown-number {
+            font-size: 3rem;
+            font-weight: 900;
+            text-shadow: 0 0 20px #ffd93d;
+        }
+
+        .game-paused {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 71, 87, 0.9);
+            color: white;
+            font-family: 'Orbitron', monospace;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 1600;
+            border: 3px solid #ff4757;
+        }
+
+        .pause-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ff4757;
+        }
+
+        .pause-message {
+            font-size: 1.2rem;
+        }
+
+        /* Collectible items */
+        .collectible {
+            position: fixed;
+            bottom: -100px;
+            font-size: 35px;
+            z-index: 1100;
+            animation: collectibleLaunch var(--duration) linear forwards;
+            cursor: pointer;
+        }
+
+        @keyframes collectibleLaunch {
+            0% { bottom: -100px; }
+            100% { bottom: 110%; }
         }
 
         #mouseTrailCanvas {
+            position: fixed;
+            top: 58px;
+            left: 58px;
+            right: 58px;
+            bottom: 58px;
+            pointer-events: none;
+            z-index: 50;
+            border-radius: 6px;
+        }
+
+        /* Mission Success Screen */
+        .mission-success {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            /* Don't block mouse interactions */
-            z-index: 500;
-            /* Behind the rockets but above the background */
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 3000;
+            font-family: 'Orbitron', monospace;
         }
+
+        .success-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #ffd93d;
+            text-shadow: 
+                0 0 20px #ffd93d,
+                0 0 40px #ffd93d;
+            margin-bottom: 30px;
+            animation: successPulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        .mission-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            font-size: 1.5rem;
+            color: #66fcf1;
+            text-shadow: 0 0 10px #66fcf1;
+        }
+
+        .next-mission-button {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ffd93d, #ff9ff3);
+            color: #0b0c10;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 
+                0 0 20px #ffd93d,
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .next-mission-button:hover {
+            transform: scale(1.1);
+            box-shadow: 
+                0 0 30px #ffd93d,
+                0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ffd93d;
+            z-index: 3500;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .wall-top { top: 0; left: 0; right: 0; height: 54px; }
+        .wall-bottom { bottom: 0; left: 0; right: 0; height: 54px; }
+        .wall-left { top: 0; bottom: 0; left: 0; width: 54px; }
+        .wall-right { top: 0; bottom: 0; right: 0; width: 54px; }
     </style>
 </head>
 
 <body>
+    <div class="stars"></div>
+    
+    <!-- Invisible walls -->
+    <div class="wall wall-top"></div>
+    <div class="wall wall-bottom"></div>
+    <div class="wall wall-left"></div>
+    <div class="wall wall-right"></div>
+    
+    <!-- Game container border -->
+    <div class="game-container"></div>
+    
+    <!-- Game title -->
+    <div id="gameTitle" class="game-title">DODGE THE ROCKETS</div>
+    
+    <!-- Score display -->
+    <div id="scoreDisplay" class="score-display" style="display: none;">
+        <div>Time: <span id="timeScore">0</span>s</div>
+        <div>Dodged: <span id="rocketScore">0</span></div>
+        <div>Collected: <span id="collectibleScore">0</span></div>
+        <div id="powerUpStatus" style="display: none; color: #ffd93d; font-weight: bold;">⚡ INVINCIBLE: <span id="powerUpTimer">5</span>s</div>
+    </div>
+    
+    <!-- Power-up countdown display -->
+    <div id="powerUpCountdown" class="power-up-countdown" style="display: none;">
+        <div class="countdown-text">Power-up available in:</div>
+        <div class="countdown-number" id="countdownNumber">5</div>
+    </div>
+    
+    <!-- Game paused indicator -->
+    <div id="gamePausedIndicator" class="game-paused" style="display: none;">
+        <div class="pause-title">⚠️ GAME PAUSED ⚠️</div>
+        <div class="pause-message">Return to game area to continue</div>
+    </div>
 
     <canvas id="mouseTrailCanvas"></canvas>
 
-    <!-- Game Over Popup -->
-    <div id="gameOverScreen" class="gameOverScreen">
-        <h2>💥 Game Over!</h2>
-        <button id="playAgainBtn">Play</button>
+    <!-- Home Screen -->
+    <div id="homeScreen" class="home-screen">
+        <div class="home-title">DODGE THE ROCKETS</div>
+        <button id="startBtn" class="play-button">🚀 START MISSION 🚀</button>
     </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="gameOverScreen">
+        <div class="game-over-title">💥 MISSION FAILED! 💥</div>
+        <div class="score-info">
+            <div>Survival Time: <span id="finalTime">0</span> seconds</div>
+            <div>Rockets Dodged: <span id="finalRockets">0</span></div>
+            <div>Items Collected: <span id="finalCollectibles">0</span></div>
+        </div>
+        <button id="playAgainBtn" class="play-again-button">🔄 RETRY MISSION</button>
+    </div>
+
+    <!-- Mission Success Screen -->
+    <div id="missionSuccessScreen" class="mission-success">
+        <div id="successTitle" class="success-title">🎉 MISSION 1 COMPLETED! 🎉</div>
+        <div class="mission-info">
+            <div>Mission <span id="successMissionNumber">1</span> Duration: <span id="successTime">0</span> seconds</div>
+            <div>Rockets Dodged: <span id="successRockets">0</span></div>
+            <div>Items Collected: <span id="successCollectibles">0</span></div>
+            <div style="margin-top: 20px; font-size: 1.2rem;">🚀 Next Mission Info 🚀</div>
+            <div>Duration: <span id="nextMissionDuration">120</span> seconds</div>
+            <div>Theme: <span id="nextMissionTheme">Fire Mission</span></div>
+        </div>
+        <button id="nextMissionBtn" class="next-mission-button">🚀 START NEXT MISSION</button>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="explosionSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFAg+ltryxnkpBSl+zPLZizoIGGS57+OZSA0PUqzn77BdGgU2jdXzzn0vBSJ0xe/eizELElyx6OyrWBUIOpHY88p9LgUme8rx3I4+CRZiturqpVITC1Kq5O+zYBoGNIzU8tGAMgUhccPu45U2CxJYrOPyxoA2BSp+zPLdizQKElyx5+2ubxgELIvS8dR/NwYfccLu24k5CRVduenmnUoODVGn4O60XxsFN47R8dqCLAUie8jy24c6CRZftuTpnEsODU+q4e+0aRgFLIvS8dF8MgUhccHu3Y05CRVduunmm0wOEU+p4O+0XxwGOIzU8tGAMgcjd8Xu2oo5CRVhtuPqm0sODlGq4u60XhoGNovS8dGANgUie8Xv2Yg7ChVftuLnm0kNDVCp4e+0XxsGNozT8tCDNwYgb8Hu2Ik4CBZftuHun00PEFF0w+7dmzYKEFlrubDRJVRYOD" type="audio/wav">
+    </audio>
 
     <script src="ui/rocket-launcher.js"></script>
 
     <script>
         window.onload = () => {
+            const homeScreen = document.getElementById('homeScreen');
             const gameOverScreen = document.getElementById('gameOverScreen');
+            const startBtn = document.getElementById('startBtn');
             const playAgainBtn = document.getElementById('playAgainBtn');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const timeScore = document.getElementById('timeScore');
+            const rocketScore = document.getElementById('rocketScore');
+            const collectibleScore = document.getElementById('collectibleScore');
+            const finalTime = document.getElementById('finalTime');
+            const finalRockets = document.getElementById('finalRockets');
+            const finalCollectibles = document.getElementById('finalCollectibles');
+            const powerUpStatus = document.getElementById('powerUpStatus');
+            const powerUpTimer = document.getElementById('powerUpTimer');
+            const powerUpCountdown = document.getElementById('powerUpCountdown');
+            const countdownNumber = document.getElementById('countdownNumber');
+            const gamePausedIndicator = document.getElementById('gamePausedIndicator');
+            const explosionSound = document.getElementById('explosionSound');
 
             let rocketLauncher;
             let launchInterval;
+            let gameStartTime;
+            let gameTimer;
+            let powerUpSpawnTimer;
+            let powerUpCountdownTimer;
+            let rocketsDodged = 0;
+            let collectiblesCollected = 0;
+            let gameActive = false;
+            let gamePaused = false;
+            let isInvincible = false;
+            let invincibilityTimer = null;
+            let mouseOutOfBounds = false;
+            let pausedTime = 0;
+            let currentMission = 1;
+            let missionDuration = 60; // Start with 60 seconds
+            let missionStartTime = 0;
+            
+            const themes = [
+                { name: "Space Mission", primary: "#66fcf1", secondary: "#45a29e", bg: "radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 25%, #0f0f23 100%)", accent: "#4ecdc4" },
+                { name: "Fire Mission", primary: "#ff6b6b", secondary: "#ff4757", bg: "radial-gradient(ellipse at center, #2c1810 0%, #3c2415 25%, #1a0f08 100%)", accent: "#ff9ff3" },
+                { name: "Ocean Mission", primary: "#3742fa", secondary: "#2f3542", bg: "radial-gradient(ellipse at center, #0c2461 0%, #0a1e3d 25%, #040d19 100%)", accent: "#70a1ff" },
+                { name: "Forest Mission", primary: "#26de81", secondary: "#20bf6b", bg: "radial-gradient(ellipse at center, #0f3460 0%, #0a2c4a 25%, #051729 100%)", accent: "#7bed9f" },
+                { name: "Sunset Mission", primary: "#ff7675", secondary: "#fd79a8", bg: "radial-gradient(ellipse at center, #2d3436 0%, #636e72 25%, #2d3436 100%)", accent: "#fdcb6e" }
+            ];
+            
+            function getCurrentTheme() {
+                return themes[(currentMission - 1) % themes.length];
+            }
+            
+            function applyTheme(theme) {
+                document.documentElement.style.setProperty('--primary-color', theme.primary);
+                document.documentElement.style.setProperty('--secondary-color', theme.secondary);
+                document.documentElement.style.setProperty('--accent-color', theme.accent);
+                document.body.style.background = theme.bg;
+                
+                // Update UI elements
+                const elements = document.querySelectorAll('.game-title, .home-title, .score-display, .play-button');
+                elements.forEach(el => {
+                    if (el.classList.contains('play-button')) {
+                        el.style.background = `linear-gradient(45deg, ${theme.primary}, ${theme.secondary})`;
+                        el.style.boxShadow = `0 0 30px ${theme.primary}, 0 10px 20px rgba(0, 0, 0, 0.3)`;
+                    } else {
+                        el.style.color = theme.primary;
+                        el.style.textShadow = `0 0 10px ${theme.primary}, 0 0 20px ${theme.primary}`;
+                    }
+                });
+            }
+
+            // Create explosion sound programmatically
+            function createExplosionSound() {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(0.1, audioContext.currentTime + 0.5);
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+
+            function updateTimer() {
+                if (!gameActive || gamePaused) return;
+                const currentTime = Math.floor((Date.now() - gameStartTime - pausedTime) / 1000);
+                timeScore.textContent = currentTime;
+                
+                // Check for mission completion
+                if (currentTime >= missionDuration) {
+                    missionCompleted();
+                }
+            }
+
+            function spawnPowerUp() {
+                if (!gameActive) return;
+                
+                const powerUp = document.createElement('div');
+                powerUp.className = 'power-up';
+                powerUp.textContent = '⭐';
+                powerUp.style.left = Math.random() * (window.innerWidth - 150) + 75 + 'px';
+                powerUp.style.top = Math.random() * (window.innerHeight - 200) + 100 + 'px';
+                
+                document.body.appendChild(powerUp);
+                
+                // Show countdown
+                powerUpCountdown.style.display = 'block';
+                let countdown = 5;
+                countdownNumber.textContent = countdown;
+                
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    countdownNumber.textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        powerUpCountdown.style.display = 'none';
+                        if (powerUp.parentNode) {
+                            powerUp.remove();
+                        }
+                    }
+                }, 1000);
+                
+                // Remove power-up after 5 seconds
+                setTimeout(() => {
+                    if (powerUp.parentNode) {
+                        powerUp.remove();
+                    }
+                    powerUpCountdown.style.display = 'none';
+                }, 5000);
+                
+                // Click handler for collecting power-up
+                powerUp.addEventListener('click', () => {
+                    if (!gamePaused) {
+                        activateInvincibility();
+                        powerUp.remove();
+                        powerUpCountdown.style.display = 'none';
+                        clearInterval(countdownInterval);
+                    }
+                });
+            }
+
+            function activateInvincibility() {
+                isInvincible = true;
+                powerUpStatus.style.display = 'block';
+                let timeLeft = 5;
+                
+                if (invincibilityTimer) {
+                    clearInterval(invincibilityTimer);
+                }
+                
+                invincibilityTimer = setInterval(() => {
+                    timeLeft--;
+                    powerUpTimer.textContent = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        isInvincible = false;
+                        powerUpStatus.style.display = 'none';
+                        clearInterval(invincibilityTimer);
+                    }
+                }, 1000);
+            }
+
+            function missionCompleted() {
+                gameActive = false;
+                gamePaused = false;
+                clearInterval(gameTimer);
+                clearInterval(powerUpSpawnTimer);
+                if (invincibilityTimer) {
+                    clearInterval(invincibilityTimer);
+                }
+                
+                // Create confetti
+                createConfetti();
+                
+                const survivalTime = Math.floor((Date.now() - gameStartTime - pausedTime) / 1000);
+                
+                // Show mission success screen
+                const missionSuccessScreen = document.getElementById('missionSuccessScreen');
+                const successTitle = document.getElementById('successTitle');
+                const successMissionNumber = document.getElementById('successMissionNumber');
+                const successTime = document.getElementById('successTime');
+                const successRockets = document.getElementById('successRockets');
+                const successCollectibles = document.getElementById('successCollectibles');
+                const nextMissionDuration = document.getElementById('nextMissionDuration');
+                const nextMissionTheme = document.getElementById('nextMissionTheme');
+                
+                successTitle.textContent = `🎉 MISSION ${currentMission} COMPLETED! 🎉`;
+                successMissionNumber.textContent = currentMission;
+                successTime.textContent = survivalTime;
+                successRockets.textContent = rocketsDodged;
+                successCollectibles.textContent = collectiblesCollected;
+                nextMissionDuration.textContent = missionDuration + 60;
+                nextMissionTheme.textContent = themes[currentMission % themes.length].name;
+                
+                scoreDisplay.style.display = 'none';
+                powerUpStatus.style.display = 'none';
+                gamePausedIndicator.style.display = 'none';
+                powerUpCountdown.style.display = 'none';
+                missionSuccessScreen.style.display = 'flex';
+                
+                // Clear objects
+                if (rocketLauncher) {
+                    rocketLauncher.clearAllObjects();
+                }
+                document.querySelectorAll('.power-up').forEach(p => p.remove());
+                document.removeEventListener('mousemove', checkMouseBounds);
+            }
+            
+            function createConfetti() {
+                const colors = ['#ffd93d', '#ff6b6b', '#4ecdc4', '#45a29e', '#66fcf1', '#a8e6cf'];
+                for (let i = 0; i < 100; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti';
+                        confetti.style.left = Math.random() * 100 + '%';
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.animationDelay = Math.random() * 2 + 's';
+                        document.body.appendChild(confetti);
+                        
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, 3000);
+                    }, i * 30);
+                }
+            }
+
+            function checkMouseBounds(e) {
+                const gameRect = {
+                    left: 58, // Increased from 54 to reduce gap
+                    top: 58,
+                    right: window.innerWidth - 58,
+                    bottom: window.innerHeight - 58
+                };
+
+                const wasOutOfBounds = mouseOutOfBounds;
+                mouseOutOfBounds = (e.clientX <= gameRect.left || e.clientX >= gameRect.right || 
+                                   e.clientY <= gameRect.top || e.clientY >= gameRect.bottom);
+                
+                if (mouseOutOfBounds && !wasOutOfBounds) {
+                    // Just went out of bounds - FULLY pause game
+                    gamePaused = true;
+                    gamePausedIndicator.style.display = 'block';
+                    pausedTime = Date.now();
+                    
+                    // Pause all rocket animations
+                    document.querySelectorAll('.rocket, .collectible').forEach(obj => {
+                        obj.style.animationPlayState = 'paused';
+                    });
+                } else if (!mouseOutOfBounds && wasOutOfBounds) {
+                    // Just came back in bounds - resume game
+                    gamePaused = false;
+                    gamePausedIndicator.style.display = 'none';
+                    if (pausedTime > 0) {
+                        pausedTime = Date.now() - pausedTime;
+                    }
+                    
+                    // Resume all rocket animations
+                    document.querySelectorAll('.rocket, .collectible').forEach(obj => {
+                        obj.style.animationPlayState = 'running';
+                    });
+                }
+            }
 
             function startGame() {
-                rocketLauncher = new RocketLauncher(gameOver);
-                launchInterval = setInterval(() => {
-                    rocketLauncher.launchRocket();
-                }, 75);
+                gameActive = true;
+                gamePaused = false;
+                rocketsDodged = 0;
+                collectiblesCollected = 0;
+                isInvincible = false;
+                mouseOutOfBounds = false;
+                pausedTime = 0;
+                gameStartTime = Date.now();
+                missionStartTime = gameStartTime;
+                
+                // Apply current theme
+                applyTheme(getCurrentTheme());
+                
+                homeScreen.style.display = 'none';
+                scoreDisplay.style.display = 'block';
+                gamePausedIndicator.style.display = 'none';
+                powerUpStatus.style.display = 'none';
+                
+                // Update mission info
+                document.getElementById('gameTitle').textContent = `${getCurrentTheme().name.toUpperCase()} - ${missionDuration}s`;
+                
+                rocketLauncher = new RocketLauncher(
+                    () => {
+                        if (!isInvincible) {
+                            gameOver();
+                        }
+                    }, 
+                    () => {
+                        if (!gamePaused && gameActive) {
+                            rocketsDodged++;
+                            rocketScore.textContent = rocketsDodged;
+                        }
+                    },
+                    () => {
+                        if (!gamePaused && gameActive) {
+                            collectiblesCollected++;
+                            collectibleScore.textContent = collectiblesCollected;
+                        }
+                    }
+                );
+                
+                // Start with shorter intervals and faster speed-up for more rockets
+                let interval = 600; // Reduced from 800
+                const minInterval = 150; // Reduced from 200
+                const speedUpRate = 0.96; // Faster speed-up from 0.98
+                
+                function launchObjects() {
+                    if (!gameActive) return;
+                    if (!gamePaused) {
+                        rocketLauncher.launchRocket();
+                        
+                        // Occasionally spawn collectibles (much less frequent than rockets)
+                        if (Math.random() < 0.2) {
+                            rocketLauncher.launchCollectible();
+                        }
+                    }
+                    interval = Math.max(minInterval, interval * speedUpRate);
+                    setTimeout(launchObjects, interval);
+                }
+                
+                launchObjects();
+                gameTimer = setInterval(updateTimer, 100);
+                
+                // Spawn power-ups every 30 seconds
+                powerUpSpawnTimer = setInterval(() => {
+                    if (gameActive && !gamePaused) {
+                        spawnPowerUp();
+                    }
+                }, 30000);
+                
+                // Add mouse move listener for boundary checking
+                document.addEventListener('mousemove', checkMouseBounds);
             }
 
             function gameOver() {
-                clearInterval(launchInterval);
+                gameActive = false;
+                gamePaused = false;
+                clearInterval(gameTimer);
+                clearInterval(powerUpSpawnTimer);
+                if (invincibilityTimer) {
+                    clearInterval(invincibilityTimer);
+                }
+                
+                // Play explosion sound
+                createExplosionSound();
+                
+                const survivalTime = Math.floor((Date.now() - gameStartTime - pausedTime) / 1000);
+                finalTime.textContent = survivalTime;
+                finalRockets.textContent = rocketsDodged;
+                finalCollectibles.textContent = collectiblesCollected;
+                
+                scoreDisplay.style.display = 'none';
+                powerUpStatus.style.display = 'none';
+                gamePausedIndicator.style.display = 'none';
+                powerUpCountdown.style.display = 'none';
                 gameOverScreen.style.display = 'flex';
-                playAgainBtn.textContent = 'Play Again'; // Change button to "Play Again"
+                
+                // Remove power-ups
+                document.querySelectorAll('.power-up').forEach(p => p.remove());
+                document.removeEventListener('mousemove', checkMouseBounds);
             }
 
-            playAgainBtn.addEventListener('click', () => {
-                // Remove all previous rockets
-                document.querySelectorAll('.rocket').forEach(r => r.remove());
-                gameOverScreen.style.display = 'none';
-                clearTrail(); // Clear the canvas trail
+            function startNextMission() {
+                currentMission++;
+                missionDuration += 60; // Add 60 seconds to each mission
+                document.getElementById('missionSuccessScreen').style.display = 'none';
+                clearTrail();
+                timeScore.textContent = '0';
+                rocketScore.textContent = '0';
+                collectibleScore.textContent = '0';
                 startGame();
-            });
-        }
+            }
 
+            function resetGame() {
+                gameActive = false;
+                gamePaused = false;
+                isInvincible = false;
+                mouseOutOfBounds = false;
+                pausedTime = 0;
+                currentMission = 1;
+                missionDuration = 60;
+                clearInterval(gameTimer);
+                clearInterval(powerUpSpawnTimer);
+                if (invincibilityTimer) {
+                    clearInterval(invincibilityTimer);
+                }
+                
+                // Reset theme
+                applyTheme(getCurrentTheme());
+                
+                // Properly clear all objects
+                if (rocketLauncher) {
+                    rocketLauncher.clearAllObjects();
+                }
+                
+                // Remove power-ups and confetti
+                document.querySelectorAll('.power-up, .confetti').forEach(p => p.remove());
+                
+                gameOverScreen.style.display = 'none';
+                document.getElementById('missionSuccessScreen').style.display = 'none';
+                homeScreen.style.display = 'flex';
+                powerUpStatus.style.display = 'none';
+                gamePausedIndicator.style.display = 'none';
+                powerUpCountdown.style.display = 'none';
+                clearTrail();
+                timeScore.textContent = '0';
+                rocketScore.textContent = '0';
+                collectibleScore.textContent = '0';
+                rocketsDodged = 0;
+                collectiblesCollected = 0;
+                
+                document.removeEventListener('mousemove', checkMouseBounds);
+            }
+
+            startBtn.addEventListener('click', startGame);
+            playAgainBtn.addEventListener('click', resetGame);
+            document.getElementById('nextMissionBtn').addEventListener('click', startNextMission);
+        };
     </script>
 
     <script>
-        // Mouse trail logic
+        // Mouse trail logic with boundary constraints
         const canvas = document.getElementById('mouseTrailCanvas');
         const ctx = canvas.getContext('2d');
 
-        let width = window.innerWidth;
-        let height = window.innerHeight;
+        let width = window.innerWidth - 108; // Account for walls
+        let height = window.innerHeight - 108;
         canvas.width = width;
         canvas.height = height;
 
         window.addEventListener('resize', () => {
-            width = window.innerWidth;
-            height = window.innerHeight;
+            width = window.innerWidth - 108;
+            height = window.innerHeight - 108;
             canvas.width = width;
             canvas.height = height;
         });
@@ -172,16 +1042,34 @@
         let lastX = 0;
         let lastY = 0;
         let isFirstMove = true;
+        let constrainedX = 0;
+        let constrainedY = 0;
 
         window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
+            // Constrain mouse to game area with updated bounds
+            const gameRect = {
+                left: 58, // Updated to match checkMouseBounds
+                top: 58,
+                right: window.innerWidth - 58,
+                bottom: window.innerHeight - 58
+            };
+
+            constrainedX = Math.max(gameRect.left, Math.min(gameRect.right, e.clientX));
+            constrainedY = Math.max(gameRect.top, Math.min(gameRect.bottom, e.clientY));
+            
+            mouseX = constrainedX - 58; // Updated offset
+            mouseY = constrainedY - 58;
+            
+            // Store current mouse position globally for collision detection
+            window.currentMousePosition = { x: mouseX, y: mouseY };
         });
 
         function drawTrail() {
             ctx.strokeStyle = '#66fcf1';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.lineCap = 'round';
+            ctx.shadowColor = '#66fcf1';
+            ctx.shadowBlur = 10;
 
             ctx.beginPath();
             if (isFirstMove) {
@@ -197,7 +1085,7 @@
             lastY = mouseY;
 
             // Fade out old lines by drawing a semi-transparent rectangle over the canvas
-            ctx.fillStyle = 'rgba(11, 12, 16, 0.1)'; // Same as background color with transparency
+            ctx.fillStyle = 'rgba(26, 26, 46, 0.1)';
             ctx.fillRect(0, 0, width, height);
 
             requestAnimationFrame(drawTrail);
@@ -205,7 +1093,7 @@
 
         function clearTrail() {
             ctx.clearRect(0, 0, width, height);
-            isFirstMove = true; // So it doesn't draw a line from the old mouse position
+            isFirstMove = true;
         }
 
         drawTrail();
