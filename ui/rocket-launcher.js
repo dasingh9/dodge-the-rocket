@@ -54,58 +54,35 @@ class Rocket {
             this.element.remove();
         });
 
-        // Swept collision detection — checks the line segment the cursor travelled
-        // between frames against the rocket's circle, preventing fast-cursor tunnelling.
+        // Simple distance check — reliable for stationary and moving cursor.
+        // Called every animation frame from the rAF loop, so no tunnelling possible.
         this.checkCollision = () => {
             if (!this.element.parentNode) return;
 
             const rect = this.element.getBoundingClientRect();
-            const mouseTrailCanvas = document.getElementById('mouseTrailCanvas');
-            if (!mouseTrailCanvas) return;
+            const cur = window.currentMousePosition;
+            if (!cur) return;
 
-            const canvasRect = mouseTrailCanvas.getBoundingClientRect();
-            const cur  = window.currentMousePosition  || { x: 0, y: 0 };
-            const prev = window.previousMousePosition || cur;
-
-            // Convert canvas-relative coords to screen coords
-            const x1 = prev.x + canvasRect.left;
-            const y1 = prev.y + canvasRect.top;
-            const x2 = cur.x  + canvasRect.left;
-            const y2 = cur.y  + canvasRect.top;
+            // currentMousePosition is canvas-relative; canvas is fixed at (58,58)
+            // window.shipX/Y (screen coords) are used instead when the sun UV ray is active
+            const screenMouseX = window.shipX !== undefined ? window.shipX : (cur.x + 58);
+            const screenMouseY = window.shipY !== undefined ? window.shipY : (cur.y + 58);
 
             const cx = rect.left + rect.width  / 2;
             const cy = rect.top  + rect.height / 2;
-            const radius = 26;
 
-            // Vector from segment start to rocket center
-            const dx = x2 - x1;
-            const dy = y2 - y1;
-            const fx = x1 - cx;
-            const fy = y1 - cy;
+            const dx = screenMouseX - cx;
+            const dy = screenMouseY - cy;
 
-            const a = dx * dx + dy * dy;
-            const b = 2 * (fx * dx + fy * dy);
-            const c = fx * fx + fy * fy - radius * radius;
-
-            // Point check when cursor hasn't moved (a ≈ 0)
-            if (a < 0.0001) {
-                if (c <= 0 && onExplode) onExplode();
-                return;
-            }
-
-            const discriminant = b * b - 4 * a * c;
-            if (discriminant >= 0) {
-                const t = (-b - Math.sqrt(discriminant)) / (2 * a);
-                if (t >= 0 && t <= 1 && onExplode) {
-                    onExplode();
-                }
+            if (dx * dx + dy * dy < 26 * 26 && onExplode) {
+                onExplode();
             }
         };
 
-        this.collisionInterval = setInterval(this.checkCollision, 50);
-        
+        this.collisionInterval = null;
+
         this.element.addEventListener('animationend', () => {
-            clearInterval(this.collisionInterval);
+            this.element.remove();
         });
     }
 }
@@ -166,9 +143,13 @@ class Collectible {
             const centerX = rect.left + rect.width / 2 - canvasRect.left;
             const centerY = rect.top + rect.height / 2 - canvasRect.top;
             
+            // Use UV-lerped ship position if available (screen coords → canvas coords)
+            const shipCanvasX = window.shipX !== undefined ? window.shipX - canvasRect.left : mousePos.x;
+            const shipCanvasY = window.shipY !== undefined ? window.shipY - canvasRect.top  : mousePos.y;
+            
             const distance = Math.sqrt(
-                Math.pow(mousePos.x - centerX, 2) + 
-                Math.pow(mousePos.y - centerY, 2)
+                Math.pow(shipCanvasX - centerX, 2) + 
+                Math.pow(shipCanvasY - centerY, 2)
             );
             
             // Collection threshold
