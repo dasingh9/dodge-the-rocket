@@ -2639,10 +2639,12 @@
             // ── Dangerous rotating UV beams (health-draining) ────────────────
             function fireSunDangerBeam() {
                 if (!sunBossActive || !gameActive || gamePaused) return;
-                const DANGER_LENGTH   = 900;  // px
-                const DANGER_WIDTH    = 48;   // px — matches CSS (hitbox = ±24px from beam centre)
-                const DANGER_DURATION = 6000; // ms
-                const ROT_SPEED       = 0.011; // rad/frame (~0.63°/frame)
+                const DANGER_LENGTH      = 900;  // px
+                const DANGER_WIDTH       = 48;   // px — visual CSS element width
+                const BEAM_HIT_WIDTH     = 26;   // px — hitbox (±13px): only the solid gradient fill, not the glow
+                const DANGER_DURATION    = 6000; // ms
+                const ROT_SPEED          = 0.011; // rad/frame (~0.63°/frame)
+                const BEAM_SPAWN_GRACE   = 400;  // ms — no damage allowed right as beam appears
 
                 // Two beams 180° apart so there are always equal safe arcs
                 const startAngle = Math.random() * Math.PI * 2;
@@ -2650,6 +2652,7 @@
                     const beam = document.createElement('div');
                     beam.className = 'sun-danger-beam';
                     beam.style.height = DANGER_LENGTH + 'px';
+                    beam.style.opacity = '0';
                     document.body.appendChild(beam);
 
                     let angle = startAngle + offset;
@@ -2670,26 +2673,34 @@
                         beam.style.left = sunBossX + 'px';
                         beam.style.top  = sunBossY + 'px';
 
-                        const fade = elapsed > DANGER_DURATION - 700 ? (DANGER_DURATION - elapsed) / 700 : 1;
-                        beam.style.opacity = Math.max(0, fade);
+                        // Fade in during grace period, then normal fade-out near end
+                        let opacity;
+                        if (elapsed < BEAM_SPAWN_GRACE) {
+                            opacity = elapsed / BEAM_SPAWN_GRACE;
+                        } else if (elapsed > DANGER_DURATION - 700) {
+                            opacity = (DANGER_DURATION - elapsed) / 700;
+                        } else {
+                            opacity = 1;
+                        }
+                        beam.style.opacity = Math.max(0, opacity);
                         beam.style.transform = `translate(-50%, 0) rotate(${angle}rad)`;
 
-                        // Collision: project ship into beam-local space
+                        // Collision: only active after grace period — project ship into beam-local space
                         const c = window.currentMousePosition;
-                        if (c && gameActive) {
+                        if (c && gameActive && elapsed >= BEAM_SPAWN_GRACE) {
                             const rawX = c.x + 58, rawY = c.y + 58;
                             const relX = rawX - sunBossX, relY = rawY - sunBossY;
                             const bDirX  =  Math.sin(angle), bDirY  = Math.cos(angle);
                             const bPerpX = -Math.cos(angle), bPerpY = Math.sin(angle);
                             const along = relX * bDirX  + relY * bDirY;
                             const perp  = relX * bPerpX + relY * bPerpY;
-                            if (along > SUN_RADIUS && along < DANGER_LENGTH && Math.abs(perp) < DANGER_WIDTH / 2) {
+                            if (along > SUN_RADIUS && along < DANGER_LENGTH && Math.abs(perp) < BEAM_HIT_WIDTH / 2) {
                                 window.sunInUVRay = true;
                                 uvOverlay.style.display = 'block';
-                                // Drain 1 hp every 100ms directly (reliable, no flag-timing race)
+                                // Drain 5 hp every 100ms while inside a beam
                                 if (!isInvincible && ts - lastDangerDrainTime >= 100) {
                                     lastDangerDrainTime = ts;
-                                    sunHealth = Math.max(0, sunHealth - 1);
+                                    sunHealth = Math.max(0, sunHealth - 5);
                                     sunHealthFill.style.width = sunHealth + '%';
                                     if (sunHealth < 30) {
                                         sunHealthFill.style.background = 'linear-gradient(90deg,#cc0000 0%,#ff2200 100%)';
